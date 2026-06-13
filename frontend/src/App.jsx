@@ -1,122 +1,144 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from "react";
+import axios from "axios";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [formData, setFormData] = useState({
+    name: "",
+    age: "",
+    phone: "",
+    priority: "Normal",
+  });
+
+  const [patients, setPatients] = useState([]);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const fetchPatients = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/api/patients"
+      );
+
+      setPatients(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const addPatient = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/patients/add",
+        formData
+      );
+
+      alert(`Patient Added: ${res.data.tokenNumber}`);
+
+      setFormData({
+        name: "",
+        age: "",
+        phone: "",
+        priority: "Normal",
+      });
+
+      fetchPatients();
+    } catch (error) {
+      console.log(error);
+      alert("Error adding patient");
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div style={{ padding: "30px" }}>
+      <h1>Queue Cure</h1>
 
-      <div className="ticks"></div>
+      <input
+        type="text"
+        name="name"
+        placeholder="Patient Name"
+        value={formData.name}
+        onChange={handleChange}
+      />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <br /><br />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <input
+        type="number"
+        name="age"
+        placeholder="Age"
+        value={formData.age}
+        onChange={handleChange}
+      />
+
+      <br /><br />
+
+      <input
+        type="text"
+        name="phone"
+        placeholder="Phone Number"
+        value={formData.phone}
+        onChange={handleChange}
+      />
+
+      <br /><br />
+
+      <select
+        name="priority"
+        value={formData.priority}
+        onChange={handleChange}
+      >
+        <option value="Normal">Normal</option>
+        <option value="Urgent">Urgent</option>
+        <option value="Emergency">Emergency</option>
+      </select>
+
+      <br /><br />
+
+      <button onClick={addPatient}>
+        Add Patient
+      </button>
+
+      <hr />
+
+      <h2>Patient List</h2>
+
+      <table border="1" cellPadding="10">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Phone</th>
+            <th>Priority</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {patients.map((patient) => (
+            <tr key={patient._id}>
+              <td>{patient.tokenNumber}</td>
+              <td>{patient.name}</td>
+              <td>{patient.age}</td>
+              <td>{patient.phone}</td>
+              <td>{patient.priority}</td>
+              <td>{patient.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
-export default App
+export default App;
