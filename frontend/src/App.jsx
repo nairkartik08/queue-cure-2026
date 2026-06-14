@@ -31,8 +31,28 @@ function App() {
     }
   };
 
+  const [currentToken, setCurrentToken] = useState("");
+
+ const callNextPatient = async () => {
+  try {
+
+    const res = await axios.post(
+      "http://localhost:5000/api/patients/call-next"
+    );
+
+    setCurrentToken(res.data.currentToken);
+
+    fetchPatients();
+    fetchCurrentToken();
+
+  } catch (error) {
+    alert("No patients waiting");
+  }
+};
+
   useEffect(() => {
     fetchPatients();
+    fetchCurrentToken();
   }, []);
 
   const addPatient = async () => {
@@ -57,6 +77,20 @@ function App() {
       alert("Error adding patient");
     }
   };
+
+  const fetchCurrentToken = async () => {
+  try {
+    const res = await axios.get(
+      "http://localhost:5000/api/patients/current-token"
+    );
+
+    if (res.data) {
+      setCurrentToken(res.data.currentToken || "");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   return (
     <div style={{ padding: "30px" }}>
@@ -109,6 +143,14 @@ function App() {
       </button>
 
       <hr />
+
+      <h2>
+        Current Token: {currentToken || "No Patient Called Yet"}
+      </h2>
+
+      <button onClick={callNextPatient}>
+        Call Next Patient
+      </button>
 
       <h2>Patient List</h2>
 
