@@ -33,22 +33,52 @@ function App() {
 
   const [currentToken, setCurrentToken] = useState("");
 
- const callNextPatient = async () => {
-  try {
+  const [clinicStatus, setClinicStatus] =
+    useState("OPEN");
 
-    const res = await axios.post(
-      "http://localhost:5000/api/patients/call-next"
+  const callNextPatient = async () => {
+    try {
+
+      const res = await axios.post(
+        "http://localhost:5000/api/patients/call-next"
+      );
+
+      setCurrentToken(res.data.currentToken);
+
+      fetchPatients();
+      fetchCurrentToken();
+
+    } catch (error) {
+      alert("No patients waiting");
+    }
+  };
+
+  const endClinic = async () => {
+
+    const confirmEnd = window.confirm(
+      "Are you sure you want to close today's clinic?"
     );
 
-    setCurrentToken(res.data.currentToken);
+    if (!confirmEnd) return;
 
-    fetchPatients();
-    fetchCurrentToken();
+    try {
 
-  } catch (error) {
-    alert("No patients waiting");
-  }
-};
+      const res = await axios.post(
+        "http://localhost:5000/api/patients/end-clinic"
+      );
+
+      setClinicStatus("CLOSED");
+
+      alert(res.data.message);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Error closing clinic");
+
+    }
+  };
 
   useEffect(() => {
     fetchPatients();
@@ -79,22 +109,39 @@ function App() {
   };
 
   const fetchCurrentToken = async () => {
-  try {
-    const res = await axios.get(
-      "http://localhost:5000/api/patients/current-token"
-    );
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/api/patients/current-token"
+      );
 
-    if (res.data) {
-      setCurrentToken(res.data.currentToken || "");
+      if (res.data) {
+        setCurrentToken(res.data.currentToken || "");
+      }
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.log(error);
-  }
-};
+  };
+
+  const today = new Date();
+
+  const currentDate =
+    today.toLocaleDateString("en-IN");
+
+  const currentDay =
+    today.toLocaleDateString(
+      "en-US",
+      { weekday: "long" }
+    );
 
   return (
     <div style={{ padding: "30px" }}>
       <h1>Queue Cure</h1>
+      <h3>Date: {currentDate}</h3>
+      <h3>Day: {currentDay}</h3>
+
+      <h3>
+        Clinic Status: {clinicStatus}
+      </h3>
 
       <input
         type="text"
@@ -138,7 +185,8 @@ function App() {
 
       <br /><br />
 
-      <button onClick={addPatient}>
+      <button onClick={addPatient}
+      disabled={clinicStatus === "CLOSED"}>
         Add Patient
       </button>
 
@@ -150,6 +198,17 @@ function App() {
 
       <button onClick={callNextPatient}>
         Call Next Patient
+      </button>
+
+      <button
+        onClick={endClinic}
+        style={{
+          marginLeft: "10px",
+          backgroundColor: "red",
+          color: "white"
+        }}
+      >
+        End Clinic
       </button>
 
       <h2>Patient List</h2>

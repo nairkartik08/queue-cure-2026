@@ -4,6 +4,18 @@ const Queue = require("../models/Queue");
 
 const router = express.Router();
 
+const today = new Date();
+
+const visitDate = today.toLocaleDateString("en-IN");
+
+const ClinicSession =
+require("../models/ClinicSession");
+
+const dayName = today.toLocaleDateString(
+    "en-US",
+    { weekday: "long" }
+);
+
 router.post("/add", async (req, res) => {
 
     try {
@@ -15,7 +27,10 @@ router.post("/add", async (req, res) => {
             name: req.body.name,
             age: req.body.age,
             phone: req.body.phone,
-            priority: req.body.priority
+            priority: req.body.priority,
+
+            visitDate,
+            dayName
         });
 
         await patient.save();
@@ -49,51 +64,124 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/call-next", async (req, res) => {
-  try {
+    try {
 
-    const nextPatient = await Patient.findOne({
-      status: "Waiting"
-    }).sort({ createdAt: 1 });
+        const nextPatient = await Patient.findOne({
+            status: "Waiting"
+        }).sort({ createdAt: 1 });
 
-    if (!nextPatient) {
-      return res.status(404).json({
-        message: "No patients waiting"
-      });
+        if (!nextPatient) {
+            return res.status(404).json({
+                message: "No patients waiting"
+            });
+        }
+
+        nextPatient.status = "Called";
+
+        await nextPatient.save();
+
+        let queue = await Queue.findOne();
+
+        if (!queue) {
+            queue = new Queue();
+        }
+
+        queue.currentToken = nextPatient.tokenNumber;
+
+        await queue.save();
+
+        res.json({
+            currentToken: queue.currentToken,
+            patient: nextPatient
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
     }
-
-    nextPatient.status = "Called";
-
-    await nextPatient.save();
-
-    let queue = await Queue.findOne();
-
-    if (!queue) {
-      queue = new Queue();
-    }
-
-    queue.currentToken = nextPatient.tokenNumber;
-
-    await queue.save();
-
-    res.json({
-      currentToken: queue.currentToken,
-      patient: nextPatient
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      message: error.message
-    });
-  }
 });
 
 router.get("/current-token", async (req, res) => {
 
+    try {
+
+        const queue = await Queue.findOne();
+
+        res.json(queue);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+});
+
+router.post("/end-clinic",
+async (req, res) => {
+
   try {
 
-    const queue = await Queue.findOne();
+    const today =
+    new Date().toLocaleDateString("en-IN");
 
-    res.json(queue);
+    let session =
+    await ClinicSession.findOne({
+      visitDate: today
+    });
+
+    if (!session) {
+
+      session =
+      new ClinicSession({
+
+        visitDate: today,
+
+        dayName:
+        new Date().toLocaleDateString(
+          "en-US",
+          { weekday: "long" }
+        ),
+
+        status: "CLOSED"
+      });
+
+    }
+
+    session.status = "CLOSED";
+
+    await session.save();
+
+    res.json({
+      message:
+      "Clinic closed successfully"
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+
+});
+
+router.get("/history",
+async (req, res) => {
+
+  try {
+
+    const history =
+    await Patient.find()
+      .sort({
+        createdAt: -1
+      });
+
+    res.json(history);
 
   } catch (error) {
 
