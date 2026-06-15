@@ -9,7 +9,7 @@ const today = new Date();
 const visitDate = today.toLocaleDateString("en-IN");
 
 const ClinicSession =
-require("../models/ClinicSession");
+    require("../models/ClinicSession");
 
 const dayName = today.toLocaleDateString(
     "en-US",
@@ -86,19 +86,36 @@ router.post("/call-next", async (req, res) => {
             queue = new Queue();
         }
 
-        queue.currentToken = nextPatient.tokenNumber;
+        queue.currentToken =
+            nextPatient.tokenNumber;
 
         await queue.save();
 
+        const io = req.app.get("io");
+
+        io.emit(
+            "tokenUpdated",
+            {
+                currentToken:
+                    queue.currentToken
+            }
+        );
+
         res.json({
-            currentToken: queue.currentToken,
-            patient: nextPatient
+            currentToken:
+                queue.currentToken,
+            patient:
+                nextPatient
         });
 
     } catch (error) {
+
+        console.log(error);
+
         res.status(500).json({
             message: error.message
         });
+
     }
 });
 
@@ -121,76 +138,76 @@ router.get("/current-token", async (req, res) => {
 });
 
 router.post("/end-clinic",
-async (req, res) => {
+    async (req, res) => {
 
-  try {
+        try {
 
-    const today =
-    new Date().toLocaleDateString("en-IN");
+            const today =
+                new Date().toLocaleDateString("en-IN");
 
-    let session =
-    await ClinicSession.findOne({
-      visitDate: today
+            let session =
+                await ClinicSession.findOne({
+                    visitDate: today
+                });
+
+            if (!session) {
+
+                session =
+                    new ClinicSession({
+
+                        visitDate: today,
+
+                        dayName:
+                            new Date().toLocaleDateString(
+                                "en-US",
+                                { weekday: "long" }
+                            ),
+
+                        status: "CLOSED"
+                    });
+
+            }
+
+            session.status = "CLOSED";
+
+            await session.save();
+
+            res.json({
+                message:
+                    "Clinic closed successfully"
+            });
+
+        } catch (error) {
+
+            res.status(500).json({
+                message: error.message
+            });
+
+        }
+
     });
-
-    if (!session) {
-
-      session =
-      new ClinicSession({
-
-        visitDate: today,
-
-        dayName:
-        new Date().toLocaleDateString(
-          "en-US",
-          { weekday: "long" }
-        ),
-
-        status: "CLOSED"
-      });
-
-    }
-
-    session.status = "CLOSED";
-
-    await session.save();
-
-    res.json({
-      message:
-      "Clinic closed successfully"
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: error.message
-    });
-
-  }
-
-});
 
 router.get("/history",
-async (req, res) => {
+    async (req, res) => {
 
-  try {
+        try {
 
-    const history =
-    await Patient.find()
-      .sort({
-        createdAt: -1
-      });
+            const history =
+                await Patient.find()
+                    .sort({
+                        createdAt: -1
+                    });
 
-    res.json(history);
+            res.json(history);
 
-  } catch (error) {
+        } catch (error) {
 
-    res.status(500).json({
-      message: error.message
+            res.status(500).json({
+                message: error.message
+            });
+
+        }
+
     });
-
-  }
-
-});
 
 module.exports = router;
