@@ -24,7 +24,11 @@ const patientSchema = new mongoose.Schema(
 
         priority: {
             type: String,
-            enum: ["Normal", "Urgent", "Emergency"],
+            enum: [
+                "Emergency",
+                "Urgent",
+                "Normal"
+            ],
             default: "Normal"
         },
 
@@ -34,7 +38,7 @@ const patientSchema = new mongoose.Schema(
             default: "Waiting"
         },
 
-    visitDate: {
+        visitDate: {
             type: String
         },
 

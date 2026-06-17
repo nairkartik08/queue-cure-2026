@@ -1,38 +1,46 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import History from "./History";
 
 import {
- BrowserRouter,
- Routes,
- Route
+  BrowserRouter,
+  Routes,
+  Route
 }
-from "react-router-dom";
+  from "react-router-dom";
 
 import App from "./App";
 import WaitingRoom from "./WaitingRoom";
 
 ReactDOM.createRoot(
- document.getElementById("root")
+  document.getElementById("root")
 ).render(
 
- <BrowserRouter>
+  <BrowserRouter>
 
-   <Routes>
+    <Routes>
 
-     <Route
-       path="/"
-       element={<App />}
-     />
+      <Route
+        path="/"
+        element={<App />}
+      />
 
-     <Route
-       path="/waiting-room"
-       element={
-         <WaitingRoom />
-       }
-     />
+      <Route
+        path="/waiting-room"
+        element={
+          <WaitingRoom />
+        }
+      />
 
-   </Routes>
+      <Route
+        path="/history"
+        element={
+          <History />
+        }
+      />
 
- </BrowserRouter>
+    </Routes>
+
+  </BrowserRouter>
 
 );

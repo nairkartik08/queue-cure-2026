@@ -1,4 +1,11 @@
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect
+} from "react";
+
+import {
+  useNavigate
+} from "react-router-dom";
 import axios from "axios";
 import "./App.css";
 
@@ -36,21 +43,46 @@ function App() {
   const [clinicStatus, setClinicStatus] =
     useState("OPEN");
 
+  const [avgTime,
+    setAvgTime] = useState(
+
+      localStorage.getItem(
+        "avgTime"
+      ) || 10
+
+    );
+
   const callNextPatient = async () => {
+
+    if (loading) return;
+
+    setLoading(true);
+
     try {
 
-      const res = await axios.post(
-        "http://localhost:5000/api/patients/call-next"
+      const res =
+        await axios.post(
+          "http://localhost:5000/api/patients/call-next"
+        );
+
+      setCurrentToken(
+        res.data.currentToken
       );
 
-      setCurrentToken(res.data.currentToken);
-
       fetchPatients();
+
       fetchCurrentToken();
 
     } catch (error) {
-      alert("No patients waiting");
+
+      alert(
+        "No patients waiting"
+      );
+
     }
+
+    setLoading(false);
+
   };
 
   const endClinic = async () => {
@@ -84,6 +116,15 @@ function App() {
     fetchPatients();
     fetchCurrentToken();
   }, []);
+
+  useEffect(() => {
+
+    localStorage.setItem(
+      "avgTime",
+      avgTime
+    );
+
+  }, [avgTime]);
 
   const addPatient = async () => {
     try {
@@ -122,7 +163,73 @@ function App() {
     }
   };
 
+  const completePatient = async (id) => {
+
+    try {
+
+      await axios.put(
+        `http://localhost:5000/api/patients/complete/${id}`
+      );
+
+      fetchPatients();
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+  const skipPatient = async (id) => {
+
+    try {
+
+      await axios.put(
+        `http://localhost:5000/api/patients/skip/${id}`
+      );
+
+      fetchPatients();
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
   const today = new Date();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const totalPatients =
+    patients.length;
+
+  const waitingPatients =
+    patients.filter(
+      p => p.status === "Waiting"
+    ).length;
+
+  const calledPatients =
+    patients.filter(
+      p => p.status === "Called"
+    ).length;
+
+  const completedPatients =
+    patients.filter(
+      p => p.status === "Completed"
+    ).length;
+
+  const skippedPatients =
+    patients.filter(
+      p => p.status === "Skipped"
+    ).length;
+
+  const emergencyPatients =
+    patients.filter(
+      p => p.priority === "Emergency"
+    ).length;
 
   const currentDate =
     today.toLocaleDateString("en-IN");
@@ -133,6 +240,11 @@ function App() {
       { weekday: "long" }
     );
 
+  const [
+    searchTerm,
+    setSearchTerm
+  ] = useState("");
+
   return (
     <div style={{ padding: "30px" }}>
       <h1>Queue Cure</h1>
@@ -142,6 +254,44 @@ function App() {
       <h3>
         Clinic Status: {clinicStatus}
       </h3>
+
+      <hr />
+
+      <h2>
+        Today's Summary
+      </h2>
+
+      <p>
+        Total Patients:
+        {totalPatients}
+      </p>
+
+      <p>
+        Waiting:
+        {waitingPatients}
+      </p>
+
+      <p>
+        Called:
+        {calledPatients}
+      </p>
+
+      <p>
+        Completed:
+        {completedPatients}
+      </p>
+
+      <p>
+        Skipped:
+        {skippedPatients}
+      </p>
+
+      <p>
+        Emergency:
+        {emergencyPatients}
+      </p>
+
+      <hr />
 
       <input
         type="text"
@@ -186,7 +336,7 @@ function App() {
       <br /><br />
 
       <button onClick={addPatient}
-      disabled={clinicStatus === "CLOSED"}>
+        disabled={clinicStatus === "CLOSED"}>
         Add Patient
       </button>
 
@@ -196,8 +346,36 @@ function App() {
         Current Token: {currentToken || "No Patient Called Yet"}
       </h2>
 
-      <button onClick={callNextPatient}>
-        Call Next Patient
+      <div>
+
+        <label>
+          Avg Consultation Time (mins):
+        </label>
+
+        <input
+          type="number"
+          value={avgTime}
+          onChange={(e) =>
+            setAvgTime(e.target.value)
+          }
+          style={{
+            marginLeft: "10px"
+          }}
+        />
+
+      </div>
+
+      <br />
+
+      <button
+        onClick={callNextPatient}
+        disabled={loading}
+      >
+        {
+          loading
+            ? "Calling..."
+            : "Call Next Patient"
+        }
       </button>
 
       <button
@@ -210,6 +388,30 @@ function App() {
       >
         End Clinic
       </button>
+
+      <button
+        onClick={() =>
+          navigate("/history")
+        }
+        style={{
+          marginLeft: "10px"
+        }}
+      >
+        View History
+      </button>
+
+      <input
+        type="text"
+        placeholder="Search Patient"
+        value={searchTerm}
+        onChange={(e) =>
+          setSearchTerm(
+            e.target.value
+          )
+        }
+      />
+
+      <br /><br />
 
       <h2>Patient List</h2>
 
@@ -226,16 +428,101 @@ function App() {
         </thead>
 
         <tbody>
-          {patients.map((patient) => (
-            <tr key={patient._id}>
-              <td>{patient.tokenNumber}</td>
-              <td>{patient.name}</td>
-              <td>{patient.age}</td>
-              <td>{patient.phone}</td>
-              <td>{patient.priority}</td>
-              <td>{patient.status}</td>
-            </tr>
-          ))}
+          {patients
+            .filter((patient) =>
+
+              patient.name
+                .toLowerCase()
+                .includes(
+                  searchTerm.toLowerCase()
+                )
+
+              ||
+
+              patient.tokenNumber
+                .toLowerCase()
+                .includes(
+                  searchTerm.toLowerCase()
+                )
+
+              ||
+
+              patient.phone.includes(
+                searchTerm
+              )
+            )
+            .map((patient) => (
+
+              <tr key={patient._id}>
+                <td>{patient.tokenNumber}</td>
+                <td>{patient.name}</td>
+                <td>{patient.age}</td>
+                <td>{patient.phone}</td>
+                <td>
+
+                  <span
+                    style={{
+                      color:
+                        patient.priority ===
+                          "Emergency"
+                          ? "red"
+                          :
+                          patient.priority ===
+                            "Urgent"
+                            ? "orange"
+                            : "green",
+
+                      fontWeight:
+                        "bold"
+                    }}
+                  >
+
+                    {patient.priority}
+
+                  </span>
+
+                </td>
+                <td>
+
+                  {patient.status}
+
+                  {patient.status === "Called" && (
+
+                    <>
+
+                      <button
+                        onClick={() =>
+                          completePatient(
+                            patient._id
+                          )
+                        }
+                        style={{
+                          marginLeft: "10px"
+                        }}
+                      >
+                        Complete
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          skipPatient(
+                            patient._id
+                          )
+                        }
+                        style={{
+                          marginLeft: "10px"
+                        }}
+                      >
+                        Skip
+                      </button>
+
+                    </>
+
+                  )}
+
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

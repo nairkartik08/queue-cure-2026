@@ -20,18 +20,45 @@ router.post("/add", async (req, res) => {
 
     try {
 
-        const count = await Patient.countDocuments();
+        const today = new Date();
 
-        const patient = new Patient({
-            tokenNumber: `T${count + 1}`,
-            name: req.body.name,
-            age: req.body.age,
-            phone: req.body.phone,
-            priority: req.body.priority,
+        const visitDate =
+            today.toLocaleDateString("en-IN");
 
-            visitDate,
-            dayName
-        });
+        const dayName =
+            today.toLocaleDateString(
+                "en-US",
+                { weekday: "long" }
+            );
+
+        const count =
+            await Patient.countDocuments({
+                visitDate: visitDate
+            });
+
+        const patient =
+            new Patient({
+
+                tokenNumber:
+                    `T${count + 1}`,
+
+                name:
+                    req.body.name,
+
+                age:
+                    req.body.age,
+
+                phone:
+                    req.body.phone,
+
+                priority:
+                    req.body.priority,
+
+                visitDate,
+
+                dayName
+
+            });
 
         await patient.save();
 
@@ -44,13 +71,24 @@ router.post("/add", async (req, res) => {
         });
 
     }
+
 });
 
 router.get("/", async (req, res) => {
 
     try {
 
-        const patients = await Patient.find();
+        const today =
+            new Date().toLocaleDateString(
+                "en-IN"
+            );
+
+        const patients =
+            await Patient.find({
+                visitDate: today
+            }).sort({
+                createdAt: 1
+            });
 
         res.json(patients);
 
@@ -61,29 +99,75 @@ router.get("/", async (req, res) => {
         });
 
     }
+
 });
 
 router.post("/call-next", async (req, res) => {
+
     try {
 
-        const nextPatient = await Patient.findOne({
-            status: "Waiting"
-        }).sort({ createdAt: 1 });
+        const today =
+            new Date().toLocaleDateString(
+                "en-IN"
+            );
+
+        let nextPatient =
+            await Patient.findOne({
+                visitDate: today,
+                status: "Waiting",
+                priority: "Emergency"
+            }).sort({
+                createdAt: 1
+            });
 
         if (!nextPatient) {
-            return res.status(404).json({
-                message: "No patients waiting"
-            });
+
+            nextPatient =
+                await Patient.findOne({
+                    visitDate: today,
+                    status: "Waiting",
+                    priority: "Urgent"
+                }).sort({
+                    createdAt: 1
+                });
+
         }
 
-        nextPatient.status = "Called";
+        if (!nextPatient) {
+
+            nextPatient =
+                await Patient.findOne({
+                    visitDate: today,
+                    status: "Waiting",
+                    priority: "Normal"
+                }).sort({
+                    createdAt: 1
+                });
+
+        }
+
+        if (!nextPatient) {
+
+            return res.status(404).json({
+                message:
+                    "No patients waiting"
+            });
+
+        }
+
+        nextPatient.status =
+            "Called";
 
         await nextPatient.save();
 
-        let queue = await Queue.findOne();
+        let queue =
+            await Queue.findOne();
 
         if (!queue) {
-            queue = new Queue();
+
+            queue =
+                new Queue();
+
         }
 
         queue.currentToken =
@@ -91,7 +175,8 @@ router.post("/call-next", async (req, res) => {
 
         await queue.save();
 
-        const io = req.app.get("io");
+        const io =
+            req.app.get("io");
 
         io.emit(
             "tokenUpdated",
@@ -102,10 +187,13 @@ router.post("/call-next", async (req, res) => {
         );
 
         res.json({
+
             currentToken:
                 queue.currentToken,
+
             patient:
                 nextPatient
+
         });
 
     } catch (error) {
@@ -113,17 +201,36 @@ router.post("/call-next", async (req, res) => {
         console.log(error);
 
         res.status(500).json({
-            message: error.message
+            message:
+                error.message
         });
 
     }
+
 });
 
 router.get("/current-token", async (req, res) => {
 
     try {
 
-        const queue = await Queue.findOne();
+        const today =
+            new Date().toLocaleDateString("en-IN");
+
+        const todayPatients =
+            await Patient.countDocuments({
+                visitDate: today
+            });
+
+        if (todayPatients === 0) {
+
+            return res.json({
+                currentToken: ""
+            });
+
+        }
+
+        const queue =
+            await Queue.findOne();
 
         res.json(queue);
 
@@ -172,6 +279,25 @@ router.post("/end-clinic",
 
             await session.save();
 
+            await Patient.updateMany(
+                {
+                    visitDate: today
+                },
+                {
+                    clinicClosed: true
+                }
+            );
+
+            const queue = await Queue.findOne();
+
+            if (queue) {
+
+                queue.currentToken = "";
+
+                await queue.save();
+
+            }
+
             res.json({
                 message:
                     "Clinic closed successfully"
@@ -187,27 +313,180 @@ router.post("/end-clinic",
 
     });
 
-router.get("/history",
-    async (req, res) => {
 
-        try {
+router.put("/complete/:id", async (req, res) => {
 
-            const history =
-                await Patient.find()
-                    .sort({
-                        createdAt: -1
-                    });
+    try {
 
-            res.json(history);
+        const patient =
+            await Patient.findById(req.params.id);
 
-        } catch (error) {
+        if (!patient) {
+            return res.status(404).json({
+                message: "Patient not found"
+            });
+        }
 
-            res.status(500).json({
-                message: error.message
+        patient.status = "Completed";
+
+        await patient.save();
+
+        res.json(patient);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+});
+
+router.get("/patients-ahead", async (req, res) => {
+
+    try {
+
+        const count = await Patient.countDocuments({
+            status: "Waiting"
+        });
+
+        res.json({
+            patientsAhead: count
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+});
+
+
+router.get("/analytics", async (req, res) => {
+
+    try {
+
+        const totalPatients =
+            await Patient.countDocuments();
+
+        const waiting =
+            await Patient.countDocuments({
+                status: "Waiting"
+            });
+
+        const called =
+            await Patient.countDocuments({
+                status: "Called"
+            });
+
+        const completed =
+            await Patient.countDocuments({
+                status: "Completed"
+            });
+
+        const emergency =
+            await Patient.countDocuments({
+                priority: "Emergency"
+            });
+
+        const urgent =
+            await Patient.countDocuments({
+                priority: "Urgent"
+            });
+
+        const normal =
+            await Patient.countDocuments({
+                priority: "Normal"
+            });
+
+        res.json({
+
+            totalPatients,
+
+            waiting,
+
+            called,
+
+            completed,
+
+            emergency,
+
+            urgent,
+
+            normal
+
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+});
+
+router.put("/skip/:id", async (req, res) => {
+
+    try {
+
+        const patient =
+            await Patient.findById(
+                req.params.id
+            );
+
+        if (!patient) {
+
+            return res.status(404).json({
+                message:
+                    "Patient not found"
             });
 
         }
 
-    });
+        patient.status =
+            "Skipped";
+
+        await patient.save();
+
+        res.json(patient);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message:
+                error.message
+        });
+
+    }
+
+});
+
+router.get("/history", async (req, res) => {
+
+    try {
+
+        const history =
+        await Patient.find()
+        .sort({
+            createdAt: -1
+        });
+
+        res.json(history);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+});
 
 module.exports = router;
