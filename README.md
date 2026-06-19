@@ -107,29 +107,33 @@ Patients are called automatically according to priority.
 
 # 📸 Screenshots
 
-## Dashboard
+### Dashboard
 
-![Dashboard](./screenshots/dashboard.png)
+<img src="./screenshots/dashboard.png" width="100%">
 
-## Reception Dashboard
+<img src="./screenshots/dashboard2.png" width="100%">
 
-![Reception](./screenshots/reception.png)
+### Reception
 
-## Waiting Room Display
+<img src="./screenshots/reception.png" width="100%">
 
-![Waiting Room](./screenshots/waiting-room.png)
+### Waiting Room
 
-## History Page
+<img src="./screenshots/waiting-room.png" width="100%">
 
-![History](./screenshots/history.png)
+### History
 
-## Analytics Dashboard
+<img src="./screenshots/history.png" width="100%">
 
-![Analytics](./screenshots/analytics.png)
+<img src="./screenshots/history2.png" width="100%">
 
-## Settings Page
+### Analytics
 
-![Settings](./screenshots/settings.png)
+<img src="./screenshots/analytics.png" width="100%">
+
+### Settings
+
+<img src="./screenshots/settings.png" width="100%">
 
 ---
 
