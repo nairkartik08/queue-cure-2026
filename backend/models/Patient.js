@@ -49,6 +49,14 @@ const patientSchema = new mongoose.Schema(
         clinicClosed: {
             type: Boolean,
             default: false
+        },
+
+        calledAt: {
+            type: Date
+        },
+
+        completedAt: {
+            type: Date
         }
     },
     {
