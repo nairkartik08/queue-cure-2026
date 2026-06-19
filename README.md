@@ -109,37 +109,27 @@ Patients are called automatically according to priority.
 
 ## Dashboard
 
-![Dashboard](screenshots/dashboard.png)
-
----
+![Dashboard](./screenshots/dashboard.png)
 
 ## Reception Dashboard
 
-![Reception](screenshots/reception.png)
-
----
+![Reception](./screenshots/reception.png)
 
 ## Waiting Room Display
 
-![Waiting Room](screenshots/waiting-room.png)
-
----
+![Waiting Room](./screenshots/waiting-room.png)
 
 ## History Page
 
-![History](screenshots/history.png)
-
----
+![History](./screenshots/history.png)
 
 ## Analytics Dashboard
 
-![Analytics](screenshots/analytics.png)
-
----
+![Analytics](./screenshots/analytics.png)
 
 ## Settings Page
 
-![Settings](screenshots/settings.png)
+![Settings](./screenshots/settings.png)
 
 ---
 
@@ -148,35 +138,31 @@ Patients are called automatically according to priority.
 ## Clone Repository
 
 ```bash
-git clone https://github.com/your-username/queue-cure.git
+git clone https://github.com/nairkartik08/queue-cure-2026.git
 ```
 
 ```bash
-cd queue-cure
+cd queue-cure-2026
 ```
 
 ---
 
 ## Backend Setup
 
+Install backend dependencies:
+
 ```bash
 npm install
 ```
 
-Create:
-
-```env
-.env
-```
-
-Add:
+Create a `.env` file in the root directory:
 
 ```env
 MONGO_URI=your_mongodb_connection_string
 PORT=5000
 ```
 
-Start backend:
+Start backend server:
 
 ```bash
 npm start
@@ -186,16 +172,34 @@ npm start
 
 ## Frontend Setup
 
+Open a new terminal:
+
 ```bash
 cd frontend
 ```
+
+Install frontend dependencies:
 
 ```bash
 npm install
 ```
 
+Start frontend:
+
 ```bash
 npm run dev
+```
+
+Frontend will run on:
+
+```text
+http://localhost:5173
+```
+
+Backend will run on:
+
+```text
+http://localhost:5000
 ```
 
 ---
@@ -253,6 +257,9 @@ QueueCure
 **Kartik Nair**
 
 Second Year Engineering Student
+
+GitHub:
+https://github.com/nairkartik08
 
 Built as a healthcare-focused full stack project using React, Node.js, MongoDB and Socket.IO.
 
