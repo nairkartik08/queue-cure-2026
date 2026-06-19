@@ -1,23 +1,263 @@
+# 🏥 Queue Cure
 
-# Queue Cure 2026
+Queue Cure is a modern healthcare queue management system designed for clinics, hospitals, diagnostic centers, and medical practices.
 
-A real-time clinic queue management system built for Queue Cure '26 Hackathon.
+The platform digitizes patient registration, token generation, queue tracking, waiting room displays, voice announcements, clinic analytics, and patient history management.
 
-## Features
+Built with a modern full-stack architecture using React, Node.js, Express, MongoDB, and Socket.IO.
 
-- Real-time queue updates
-- Smart wait time prediction
-- Emergency priority queue
+---
+
+## ✨ Features
+
+### 📋 Reception Dashboard
+
+- Register new patients
+- Auto-generate token numbers
+- Priority based queue management
+- Search patients instantly
+- Call Next Patient
+- Complete Patient
+- Skip Patient
+- Recall Skipped Patients
+
+---
+
+### 🔔 Smart Queue Management
+
+Priority handling:
+
+- 🔴 Emergency
+- 🟠 Urgent
+- 🟢 Normal
+
+Patients are called automatically according to priority.
+
+---
+
+### 📢 Live Waiting Room Display
+
+- Live token updates using Socket.IO
+- Now Serving display
+- Patients Ahead counter
+- Estimated wait time
 - Voice announcements
-- QR-based patient tracking
+- Public display mode for clinic TVs
 
-## Tech Stack
+---
 
-Frontend: React
-Backend: Node.js + Express
-Database: MongoDB Atlas
-Realtime: Socket.IO
+### 📊 Analytics Dashboard
 
-# queue-cure-2026
-Real-time clinic queue management system for Queue Cure '26 Hackathon
+- Total Patients
+- Waiting Patients
+- Called Patients
+- Completed Patients
+- Emergency Cases
+- Priority Distribution Chart
 
+---
+
+### 📜 History Tracking
+
+- Date-wise patient grouping
+- Clinic session records
+- Status history
+- Archived clinic data
+
+---
+
+### ⚙️ Settings
+
+- Dark Mode
+- Voice Announcements
+- Clinic Name Configuration
+- Doctor Name Configuration
+- Cabin Number Configuration
+- Wait Time Configuration
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+
+- React.js
+- React Router DOM
+- Axios
+- Recharts
+- Lucide React
+- CSS3
+
+### Backend
+
+- Node.js
+- Express.js
+- Socket.IO
+
+### Database
+
+- MongoDB
+- Mongoose
+
+### Real-Time Communication
+
+- Socket.IO
+
+---
+
+# 📸 Screenshots
+
+## Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+---
+
+## Reception Dashboard
+
+![Reception](screenshots/reception.png)
+
+---
+
+## Waiting Room Display
+
+![Waiting Room](screenshots/waiting-room.png)
+
+---
+
+## History Page
+
+![History](screenshots/history.png)
+
+---
+
+## Analytics Dashboard
+
+![Analytics](screenshots/analytics.png)
+
+---
+
+## Settings Page
+
+![Settings](screenshots/settings.png)
+
+---
+
+# 🚀 Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/your-username/queue-cure.git
+```
+
+```bash
+cd queue-cure
+```
+
+---
+
+## Backend Setup
+
+```bash
+npm install
+```
+
+Create:
+
+```env
+.env
+```
+
+Add:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+PORT=5000
+```
+
+Start backend:
+
+```bash
+npm start
+```
+
+---
+
+## Frontend Setup
+
+```bash
+cd frontend
+```
+
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+---
+
+# 📂 Project Structure
+
+```
+QueueCure
+│
+├── frontend
+│   ├── src
+│   ├── public
+│   └── package.json
+│
+├── backend
+│   ├── routes
+│   ├── models
+│   ├── config
+│   └── server.js
+│
+└── README.md
+```
+
+---
+
+# 🔄 Queue Workflow
+
+1. Patient registers
+2. Token generated automatically
+3. Patient enters waiting queue
+4. Reception clicks Call Next
+5. Waiting Room updates instantly
+6. Voice announcement plays
+7. Doctor consultation
+8. Reception marks patient as Completed
+9. Record stored in History
+
+---
+
+# 🎯 Future Enhancements
+
+- Multi-doctor support
+- SMS notifications
+- WhatsApp alerts
+- Appointment booking
+- PDF reports
+- Cloud deployment
+- Admin dashboard
+- Mobile application
+
+---
+
+# 👨‍💻 Author
+
+**Kartik Nair**
+
+Second Year Engineering Student
+
+Built as a healthcare-focused full stack project using React, Node.js, MongoDB and Socket.IO.
+
+---
+
+## ⭐ If you like this project
+
+Give it a star on GitHub ⭐

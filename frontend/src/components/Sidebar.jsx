@@ -16,7 +16,7 @@ function Sidebar() {
     return (
         <div className="sidebar">
             <h2 className="logo">
-                Queue Cure
+                🏥 Queue Cure
             </h2>
 
             <nav>

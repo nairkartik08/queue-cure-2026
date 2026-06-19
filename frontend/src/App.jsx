@@ -24,6 +24,15 @@ function App() {
 
   const [patients, setPatients] = useState([]);
 
+  const formatWaitTime = (minutes) => {
+    if (minutes < 60) {
+      return `${minutes} mins`;
+    }
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins === 0 ? `${hrs} hr` : `${hrs} hr ${mins} min`;
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -163,6 +172,17 @@ function App() {
 
 
   const addPatient = async () => {
+    const ageNum = parseInt(formData.age);
+    if (isNaN(ageNum) || ageNum < 0) {
+      showNotification("Age cannot be negative", "error");
+      return;
+    }
+    const phoneClean = formData.phone.trim();
+    if (!/^\d{10}$/.test(phoneClean)) {
+      showNotification("Mobile number must be exactly 10 digits", "error");
+      return;
+    }
+
     try {
       const res = await axios.post(
         "http://localhost:5000/api/patients/add",
@@ -423,8 +443,13 @@ function App() {
 
             {/* Reception Queue status overview (No Doctor buttons) */}
             <div className="table-card">
-              <div className="table-header">
-                <h2>Today's Patient Queue</h2>
+              <div className="table-header" style={{ alignItems: "flex-start" }}>
+                <div>
+                  <h2 style={{ margin: 0 }}>Today's Queue</h2>
+                  <p className="queue-count-subtext" style={{ margin: "4px 0 0 0", fontSize: "14px", fontWeight: "600" }}>
+                    {patients.length} Patients
+                  </p>
+                </div>
                 <input
                   type="text"
                   placeholder="Search Patient"
@@ -490,39 +515,39 @@ function App() {
             {/* Stats Grid */}
             <div className="stats-grid">
               <StatCard
-                title="Total Patients"
+                title="👥 Total Patients"
                 value={totalPatients}
               />
 
               <StatCard
-                title="Waiting"
+                title="⏳ Waiting"
                 value={waitingPatients}
               />
 
               <StatCard
-                title="Called"
+                title="📢 Called"
                 value={calledPatients}
               />
 
               <StatCard
-                title="Completed"
+                title="✅ Completed"
                 value={completedPatients}
               />
 
               <StatCard
-                title="Skipped"
+                title="🚫 Skipped"
                 value={skippedPatients}
               />
 
               <StatCard
-                title="Emergency"
+                title="🚨 Emergency"
                 value={emergencyPatients}
               />
 
               {localStorage.getItem("showWaitTime") !== "false" && (
                 <StatCard
-                  title="Est. Wait Time"
-                  value={`${Math.round(waitingPatients * (dynamicAvgTime !== null ? dynamicAvgTime : 10))} mins`}
+                  title="⏳ Est. Wait Time"
+                  value={formatWaitTime(Math.round(waitingPatients * (dynamicAvgTime !== null ? dynamicAvgTime : 10)))}
                   subtext={dynamicAvgTime !== null ? `Live: ${dynamicAvgTime}m/pat` : `Default: 10m/pat`}
                 />
               )}

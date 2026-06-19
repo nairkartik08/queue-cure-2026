@@ -112,6 +112,15 @@ function WaitingRoom() {
         };
     }, []);
 
+    const formatWaitTime = (minutes) => {
+        if (minutes < 60) {
+            return `${minutes} mins`;
+        }
+        const hrs = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return mins === 0 ? `${hrs} hr` : `${hrs} hr ${mins} min`;
+    };
+
     const showWaitTimeSetting = localStorage.getItem("showWaitTime") !== "false";
     const activeAvgTime = dynamicAvgTime !== null ? dynamicAvgTime : 10;
     const estimatedWait = Math.round(patientsAhead * activeAvgTime);
@@ -248,9 +257,9 @@ function WaitingRoom() {
                             Est. Wait Time
                         </h3>
                         <div style={{ fontSize: "36px", fontWeight: "800", color: "#0f172a" }}>
-                            {estimatedWait} <span style={{ fontSize: "16px", fontWeight: "600" }}>mins</span>
+                            {formatWaitTime(estimatedWait)}
                         </div>
-                        <div style={{ fontSize: "10px", color: "#94a3b8", marginTop: "5px", lineHeight: 1.2 }}>
+                        <div style={{ fontSize: "13px", color: "#475569", marginTop: "5px", lineHeight: 1.2 }}>
                             {waitTimeText}
                         </div>
                     </div>

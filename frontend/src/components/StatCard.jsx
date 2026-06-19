@@ -17,7 +17,7 @@ function StatCard({
       </h2>
 
       {subtext && (
-        <p style={{ fontSize: "11px", margin: "5px 0 0 0", opacity: 0.8 }}>
+        <p className="stat-card-subtext" style={{ fontSize: "13px", fontWeight: "600", margin: "8px 0 0 0" }}>
           {subtext}
         </p>
       )}

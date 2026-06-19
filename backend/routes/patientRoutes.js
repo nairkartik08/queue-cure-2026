@@ -36,6 +36,20 @@ router.post("/add", async (req, res) => {
                 visitDate: visitDate
             });
 
+        const age = parseInt(req.body.age);
+        if (isNaN(age) || age < 0) {
+            return res.status(400).json({
+                message: "Age cannot be negative"
+            });
+        }
+
+        const phone = req.body.phone ? String(req.body.phone).trim() : "";
+        if (!/^\d{10}$/.test(phone)) {
+            return res.status(400).json({
+                message: "Mobile number must be exactly 10 digits"
+            });
+        }
+
         const patient =
             new Patient({
 
@@ -46,10 +60,10 @@ router.post("/add", async (req, res) => {
                     req.body.name,
 
                 age:
-                    req.body.age,
+                    age,
 
                 phone:
-                    req.body.phone,
+                    phone,
 
                 priority:
                     req.body.priority,
@@ -410,6 +424,11 @@ router.get("/analytics", async (req, res) => {
                 status: "Completed"
             });
 
+        const skipped =
+            await Patient.countDocuments({
+                status: "Skipped"
+            });
+
         const emergency =
             await Patient.countDocuments({
                 priority: "Emergency"
@@ -434,6 +453,8 @@ router.get("/analytics", async (req, res) => {
             called,
 
             completed,
+
+            skipped,
 
             emergency,
 

@@ -8,6 +8,7 @@ import {
   Pie,
   Cell,
   Tooltip,
+  Legend,
   ResponsiveContainer
 } from "recharts";
 
@@ -65,6 +66,20 @@ function Analytics() {
     "#16a34a"
   ];
 
+  const statusData = data ? [
+    { name: "Waiting", value: data.waiting },
+    { name: "Called", value: data.called },
+    { name: "Completed", value: data.completed },
+    { name: "Skipped", value: data.skipped }
+  ] : [];
+
+  const STATUS_COLORS = [
+    "#3b82f6", // Blue for Waiting
+    "#f59e0b", // Amber for Called
+    "#16a34a", // Green for Completed
+    "#ef4444"  // Red for Skipped
+  ];
+
   return (
     <div className={darkMode ? "dashboard-layout dark-mode" : "dashboard-layout"}>
       <Sidebar />
@@ -103,41 +118,79 @@ function Analytics() {
               </div>
             </div>
 
-            <div
-              className="stat-card"
-              style={{
-                marginTop: "30px",
-                height: "450px",
-                background: darkMode ? "#1e293b" : "white",
-                color: darkMode ? "#f1f5f9" : "#1e293b",
-                border: darkMode ? "1px solid #334155" : "1px solid #e2e8f0",
-                padding: "24px",
-                borderRadius: "16px"
-              }}
-            >
-              <h2 style={{ fontSize: "20px", fontWeight: "600", margin: "0 0 20px 0" }}>
-                Priority Distribution
-              </h2>
+            <div className="charts-grid">
+              
+              {/* Priority Distribution Chart */}
+              <div
+                className="stat-card"
+                style={{
+                  height: "450px",
+                  background: darkMode ? "#1e293b" : "white",
+                  color: darkMode ? "#f1f5f9" : "#1e293b",
+                  border: darkMode ? "1px solid #334155" : "1px solid #e2e8f0",
+                  padding: "24px",
+                  borderRadius: "16px",
+                  boxSizing: "border-box"
+                }}
+              >
+                <h2 style={{ fontSize: "20px", fontWeight: "600", margin: "0 0 20px 0" }}>
+                  Priority Distribution
+                </h2>
+                <ResponsiveContainer width="100%" height="85%">
+                  <PieChart>
+                    <Pie
+                      data={priorityData}
+                      dataKey="value"
+                      nameKey="name"
+                      outerRadius={100}
+                      label
+                    >
+                      {priorityData.map((entry, index) => (
+                        <Cell key={index} fill={COLORS[index]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
 
-              <ResponsiveContainer width="100%" height="85%">
-                <PieChart>
-                  <Pie
-                    data={priorityData}
-                    dataKey="value"
-                    nameKey="name"
-                    outerRadius={120}
-                    label
-                  >
-                    {priorityData.map((entry, index) => (
-                      <Cell
-                        key={index}
-                        fill={COLORS[index]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              {/* Patient Status Distribution Chart */}
+              <div
+                className="stat-card"
+                style={{
+                  height: "450px",
+                  background: darkMode ? "#1e293b" : "white",
+                  color: darkMode ? "#f1f5f9" : "#1e293b",
+                  border: darkMode ? "1px solid #334155" : "1px solid #e2e8f0",
+                  padding: "24px",
+                  borderRadius: "16px",
+                  boxSizing: "border-box"
+                }}
+              >
+                <h2 style={{ fontSize: "20px", fontWeight: "600", margin: "0 0 20px 0" }}>
+                  Patient Status Distribution
+                </h2>
+                <ResponsiveContainer width="100%" height="85%">
+                  <PieChart>
+                    <Pie
+                      data={statusData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      outerRadius={100}
+                      label
+                    >
+                      {statusData.map((entry, index) => (
+                        <Cell key={index} fill={STATUS_COLORS[index]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
             </div>
           </>
         )}
