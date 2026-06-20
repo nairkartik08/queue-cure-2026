@@ -12,10 +12,10 @@ connectDB();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://queue-cure-2026.vercel.app"
-    ],
+    origin: (origin, callback) => {
+      // Allow all origins dynamically to support local development and all Vercel deployments
+      callback(null, true);
+    },
     credentials: true
   })
 );
@@ -36,10 +36,9 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "https://queue-cure-2026.vercel.app"
-    ],
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
     methods: ["GET", "POST"],
     credentials: true
   }
