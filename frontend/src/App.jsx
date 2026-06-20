@@ -43,7 +43,7 @@ function App() {
   const fetchPatients = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/patients"
+        `${import.meta.env.VITE_API_URL}/api/patients`
       );
 
       setPatients(res.data);
@@ -69,7 +69,7 @@ function App() {
 
   const fetchWaitTimeStats = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/patients/patients-ahead");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/patients/patients-ahead`);
       if (res.data && res.data.dynamicAvgTime !== undefined) {
         setDynamicAvgTime(res.data.dynamicAvgTime);
       }
@@ -80,7 +80,7 @@ function App() {
 
   const fetchClinicStatus = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/patients/session-status");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/patients/session-status`);
       if (res.data) {
         setClinicStatus(res.data.status);
       }
@@ -106,7 +106,7 @@ function App() {
 
       const res =
         await axios.post(
-          "http://localhost:5000/api/patients/call-next"
+          `${import.meta.env.VITE_API_URL}/api/patients/call-next`
         );
 
       setCurrentToken(
@@ -127,7 +127,7 @@ function App() {
 
   const startClinic = async () => {
     try {
-      await axios.post("http://localhost:5000/api/patients/open-clinic");
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/patients/open-clinic`);
       setClinicStatus("OPEN");
       refreshDashboard();
       showNotification("Clinic session started successfully.", "success");
@@ -148,7 +148,7 @@ function App() {
     try {
 
       const res = await axios.post(
-        "http://localhost:5000/api/patients/end-clinic"
+        `${import.meta.env.VITE_API_URL}/api/patients/end-clinic`
       );
 
       setClinicStatus("CLOSED");
@@ -185,7 +185,7 @@ function App() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/patients/add",
+        `${import.meta.env.VITE_API_URL}/api/patients/add`,
         formData
       );
 
@@ -208,7 +208,7 @@ function App() {
   const fetchCurrentToken = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/patients/current-token"
+        `${import.meta.env.VITE_API_URL}/api/patients/current-token`
       );
 
       if (res.data) {
@@ -224,7 +224,7 @@ function App() {
     try {
 
       await axios.put(
-        `http://localhost:5000/api/patients/complete/${id}`
+        `${import.meta.env.VITE_API_URL}/api/patients/complete/${id}`
       );
 
       refreshDashboard();
@@ -242,7 +242,7 @@ function App() {
     try {
 
       await axios.put(
-        `http://localhost:5000/api/patients/skip/${id}`
+        `${import.meta.env.VITE_API_URL}/api/patients/skip/${id}`
       );
 
       refreshDashboard();
@@ -260,7 +260,7 @@ function App() {
     try {
 
       await axios.put(
-        `http://localhost:5000/api/patients/recall/${id}`
+        `${import.meta.env.VITE_API_URL}/api/patients/recall/${id}`
       );
 
       refreshDashboard();

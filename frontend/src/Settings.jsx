@@ -59,7 +59,7 @@ function Settings() {
     useEffect(() => {
         const fetchStatus = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/patients/session-status");
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/patients/session-status`);
                 if (res.data) {
                     setClinicStatus(res.data.status);
                 }
@@ -117,7 +117,7 @@ function Settings() {
         );
         if (!confirmReset) return;
         try {
-            await axios.delete("http://localhost:5000/api/patients/reset-today");
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/patients/reset-today`);
             showNotification("Today's clinic queue has been reset.", "success");
             setTimeout(() => {
                 window.location.reload();

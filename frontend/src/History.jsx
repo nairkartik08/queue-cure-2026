@@ -24,7 +24,7 @@ function History() {
         
         const fetchStatus = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/patients/session-status");
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/patients/session-status`);
                 if (res.data) {
                     setClinicStatus(res.data.status);
                 }
@@ -38,7 +38,7 @@ function History() {
     const fetchHistory = async () => {
         try {
             const res = await axios.get(
-                "http://localhost:5000/api/patients/history"
+                `${import.meta.env.VITE_API_URL}/api/patients/history`
             );
             setPatients(res.data);
         } catch (error) {

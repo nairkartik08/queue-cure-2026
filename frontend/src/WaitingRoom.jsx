@@ -12,7 +12,7 @@ function WaitingRoom() {
     const fetchPatientsAhead = async () => {
         try {
             const res = await axios.get(
-                "http://localhost:5000/api/patients/patients-ahead"
+                `${import.meta.env.VITE_API_URL}/api/patients/patients-ahead`
             );
             setPatientsAhead(res.data.patientsAhead);
             if (res.data.dynamicAvgTime !== undefined) {
@@ -26,7 +26,7 @@ function WaitingRoom() {
     const fetchCurrentToken = async () => {
         try {
             const res = await axios.get(
-                "http://localhost:5000/api/patients/current-token"
+                `${import.meta.env.VITE_API_URL}/api/patients/current-token`
             );
             if (res.data) {
                 setCurrentToken(res.data.currentToken || "");

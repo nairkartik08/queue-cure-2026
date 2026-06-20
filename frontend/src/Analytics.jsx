@@ -23,7 +23,7 @@ function Analytics() {
     
     const fetchStatus = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/patients/session-status");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/patients/session-status`);
         if (res.data) {
           setClinicStatus(res.data.status);
         }
@@ -37,7 +37,7 @@ function Analytics() {
   const fetchAnalytics = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/patients/analytics"
+        `${import.meta.env.VITE_API_URL}/api/patients/analytics`
       );
       setData(res.data);
     } catch (error) {
