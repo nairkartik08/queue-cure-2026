@@ -37,10 +37,6 @@ function Topbar({ clinicStatus }) {
                 {clinicStatus}
             </div>
 
-            <div className="avatar">
-                K
-            </div>
-
         </div>
 
     );
