@@ -253,6 +253,12 @@ QueueCure
 
 ---
 
+# 🔄 Socket Event Diagram
+
+![Socket Diagram](docs/socket-event-diagram.png)
+
+---
+
 # 🎯 Future Enhancements
 
 - Multi-doctor support
