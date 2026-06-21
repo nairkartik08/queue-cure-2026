@@ -33,6 +33,15 @@ function App() {
     return mins === 0 ? `${hrs} hr` : `${hrs} hr ${mins} min`;
   };
 
+  const getWaitTimeForPatient = (patient) => {
+    if (patient.status !== "Waiting") return null;
+    const waitingList = patients.filter(p => p.status === "Waiting");
+    const index = waitingList.findIndex(p => p._id === patient._id);
+    if (index === -1) return null;
+    const timeInMins = Math.round(index * (dynamicAvgTime !== null ? dynamicAvgTime : 10));
+    return formatWaitTime(timeInMins);
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -497,9 +506,16 @@ function App() {
                             </span>
                           </td>
                           <td style={{ padding: "12px 8px" }}>
-                            <span className={`status-badge ${patient.status.toLowerCase()}`}>
-                              {patient.status}
-                            </span>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                              <span className={`status-badge ${patient.status.toLowerCase()}`}>
+                                {patient.status}
+                              </span>
+                              {searchTerm && patient.status === "Waiting" && (
+                                <span style={{ fontSize: "11px", color: darkMode ? "#94a3b8" : "#64748b", fontWeight: "600" }}>
+                                  Wait: {getWaitTimeForPatient(patient)}
+                                </span>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -676,9 +692,16 @@ function App() {
                               </span>
                             </td>
                             <td style={{ padding: "12px 8px" }}>
-                              <span className={`status-badge ${patient.status.toLowerCase()}`}>
-                                {patient.status}
-                              </span>
+                              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                                <span className={`status-badge ${patient.status.toLowerCase()}`}>
+                                  {patient.status}
+                                </span>
+                                {searchTerm && patient.status === "Waiting" && (
+                                  <span style={{ fontSize: "11px", color: darkMode ? "#94a3b8" : "#64748b", fontWeight: "600" }}>
+                                    Wait: {getWaitTimeForPatient(patient)}
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td style={{ padding: "12px 8px" }}>
                               {patient.status === "Called" && (
