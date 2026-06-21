@@ -8,6 +8,16 @@ Built with a modern full-stack architecture using React, Node.js, Express, Mongo
 
 ---
 
+## 🌐 Live Demo
+
+### Frontend
+🔗 https://queue-cure-2026.vercel.app
+
+### Backend API
+🔗 https://queue-cure-2026.onrender.com
+
+---
+
 ## ✨ Features
 
 ### 📋 Reception Dashboard
